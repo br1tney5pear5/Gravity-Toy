@@ -1,0 +1,53 @@
+
+#canvasHolder{
+	float:left;
+	background-color: #999999;
+}
+#UI{
+	box-sizing: border-box;
+	width: 200;
+	height: 502;
+	background-color: #666666;
+	float:left;
+	margin-left: 10;
+	padding: 10;
+}
+#objectSelect{
+	width: 180;
+
+}
+#addObject{
+	width: 80;
+	margin: 5;
+	margin-left: 0;
+}
+#removeObject{
+	width: 80;
+	margin: 5;
+	margin-right: 0;
+}
+#NameTextBox{
+	width: 180;
+	margin-top: 15;
+	margin-bottom: 5;
+}
+.lefttext{
+	width: 1;
+	margin:5;
+	clear: both;
+	float:left;
+
+}
+.rightTextBox{
+	float: right;
+	width: 110;
+	margin: 5;
+	margin-right: 0;
+}
+.coordinates{
+	float:right;
+	width: 55;
+	margin: 5;
+	margin-left: 0;
+	margin-right: 0;
+}
