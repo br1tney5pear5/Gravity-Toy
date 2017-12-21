@@ -3,6 +3,7 @@ class Vector2{
 	magnitude() {return Math.sqrt(Math.pow(this.x,2)+Math.pow(this.y,2));}
 	sin(){return this.y/this.magnitude();}
 	cos(){return this.x/this.magnitude();}
+	add(vector){this.x += vector.x; this.y += vector.y};
 
 }
 class GravObject{
