@@ -9,16 +9,20 @@ var VelocityYTextBox = document.getElementById("VelocityYTextBox");
 var unnamedCount = -1;
 
 var objects = [];
-objects.push(new GravObject("test", 1000, 50, new Vector2(), new Vector2(), false));
-objects.push(new GravObject("test", 10, 50, new Vector2(0,1000), new Vector2(400,0)));
+objects.push(new GravObject("test", 50, 50, new Vector2(-200,200), new Vector2(150,150)));
+objects.push(new GravObject("test", 100, 100, new Vector2(200,-200), new Vector2(0,0)));
+// objects.push(new GravObject("test", 10000, 1000, new Vector2(), new Vector2()));
+// objects.push(new GravObject("test", 200, 200, new Vector2(-100,-3000), new Vector2(400,0)));
+// objects.push(new GravObject("test", 70, 70, new Vector2(0,1400), new Vector2(400,0)));
 
 var mouseData = {
 	mousedown: false, 
     lastPos: undefined, delta: undefined};
 var camPos = new Vector2();
-var camZoom = 0.125;
+var camZoom = 1/4;
 var zoomFactor = 2;
-var animationSpeed =1;
+var shiftFactor = 100;
+
 
 function hookListeners(){
 	canvas.addEventListener("mousedown", function(event){mouseData.mousedown = true},false);
@@ -26,6 +30,7 @@ function hookListeners(){
 	canvas.addEventListener("mousemove", cameraShift, false);
 	window.addEventListener("keydown", keyManagment);
 }
+
 function cameraShift(event){
 	if(mouseData.lastPos != undefined){
 		mouseData.delta = new Vector2(event.clientX - mouseData.lastPos.x, event.clientY - mouseData.lastPos.y);
@@ -40,7 +45,12 @@ function keyManagment(event){
 	switch(event.keyCode){
 		case 33: camZoom *= zoomFactor; break; 
 		case 34: camZoom /= zoomFactor; break; 
+		case 37: camPos.x -= shiftFactor; break;
+		case 38: camPos.y -= shiftFactor; break;
+		case 39: camPos.x += shiftFactor; break;
+		case 40: camPos.y += shiftFactor; break;
 	}
+	event.preventDefault();
 }
 function addObject_Button(){
 	var option = document.createElement("option");
