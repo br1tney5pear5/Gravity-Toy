@@ -39,7 +39,7 @@ function redraw(){
 	for(let i = 0; i < objects.length; i += 1){
 	//calculations
 		var objectPos = new Vector2(relativeMid.x + objects[i].position.x * camZoom, relativeMid.y + objects[i].position.y * camZoom);
-		//drawing base
+	//drawing base
 		ctx.beginPath(); ctx.globalAlpha = 1; ctx.strokeStyle = "#000000"; ctx.setLineDash([]);
 		ctx.arc(objectPos.x,objectPos.y,objects[i].radius*camZoom,0,2*Math.PI);
 		ctx.stroke();
@@ -51,7 +51,7 @@ function redraw(){
 		ctx.stroke();
 		ctx.beginPath(); ctx.strokeStyle = "#000FFF"; ctx.setLineDash([]);
 		ctx.moveTo(objectPos.x, objectPos.y);
-		ctx.lineTo(objectPos.x + objects[i].acceleration.x*objects[i].mass*camZoom, objectPos.y + objects[i].acceleration.y*objects[i].mass*camZoom);
+		//ctx.lineTo(objectPos.x + objects[i].acceleration.x*objects[i].mass*camZoom, objectPos.y + objects[i].acceleration.y*objects[i].mass*camZoom);
 		ctx.stroke();
 	//drawing orbit evaluation
 		ctx.beginPath(); ctx.strokeStyle = "#000FF0"; ctx.setLineDash([]);
@@ -80,14 +80,13 @@ function redraw(){
 					var index1 = objects.indexOf(objects[i].radius > objects[j].radius ? objects[i] : objects[j]);
 					var index2 = objects.indexOf(objects[i].radius <= objects[j].radius ? objects[i] : objects[j]);
 					objects[index1].radius = Math.sqrt(Math.pow(objects[index1].radius,2) + Math.pow(objects[index2].radius,2));
-					objects[index1].mass += objects[index2].mass;
 					var massRatio = new Vector2(objects[index1].mass, objects[index2].mass).cos();
-					console.log(massRatio);
+					console.log(massRatio + (1-massRatio));
 					objects[index1].velocity.x = objects[index1].velocity.x*massRatio + objects[index2].velocity.x*(1-massRatio);
 					objects[index1].velocity.y =  objects[index1].velocity.y*massRatio + objects[index2].velocity.y*(1-massRatio);
-					console.log(objects[index1].radius);
+					// console.log(objects[index1].radius);
+					objects[index1].mass += objects[index2].mass;
 					objects.splice(index2,1);
-					
 					//no operations on objects[i or j] can be made after this
 				}
 			}
