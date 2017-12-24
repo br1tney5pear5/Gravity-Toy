@@ -1,13 +1,20 @@
 <head>
 <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 <link rel="stylesheet" type="text/css" href="style.css">
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
 <body>
 <div id="container">
-	<div id="canvasholder" >
+	<div  id="header">
+		<a id="link" href="https://github.com/kacperkokot">Kacper Kokot</a>
+	</div>
+
+	<div id="canvasHolder">
 		<canvas id="canvas"></canvas>
 	</div>
-	<div id="UI">
+
+
+<!-- 	<div id="UI">
 		<button onclick="addObject_Buinteria.tton()" id="addObject">Add</button>
 		<button onclick="removeObject_Button()" id="removeObject">Remove</button>
 		<select id="objectSelect"></select>
@@ -22,14 +29,11 @@
 		<p class="leftText">Velocity</p>
 		<input class="coordinates" type="text" id="VelocityXTextBox"  placeholder="X">
 		<input class="coordinates" type="text" id="VelocityYTextBox"  placeholder="Y">
-
-		
-		<!-- <button onclick="applyChanges_Button()" id="applyChanges">Apply</button> -->
 	</div>
-	
+	 -->
 </div>
 
-<script src="classes.js"></script>
+
 <script src="modelScript.js"></script>
 <script src="controllerScript.js"></script>
 <script src="viewScript.js"></script>
