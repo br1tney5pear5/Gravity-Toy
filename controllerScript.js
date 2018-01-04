@@ -1,23 +1,24 @@
-var objectSelect = document.getElementById("objectSelect");
-var NameTextBox = document.getElementById("NameTextBox");
-var MassTextBox = document.getElementById("MassTextBox");
-var RadiusTextBox = document.getElementById("RadiusTextBox");
-var PositionXTextBox = document.getElementById("PositionXTextBox");
-var PositionYTextBox = document.getElementById("PositionYTextBox");
-var VelocityXTextBox = document.getElementById("VelocityXTextBox");
-var VelocityYTextBox = document.getElementById("VelocityYTextBox");
+//modal
+var modal = document.getElementById("modal");
+var btn = document.getElementById("button");
+var close = document.getElementsByClassName("close")[0];
+//modal
 var unnamedCount = -1;
+//stabileSave
+objects.push(new GravObject("SUN", 333, 1392, new Vector2(), new Vector2()));
+objects.push(new GravObject("MERCURY", 0.06, 4.879, new Vector2(0,10000), new Vector2(500,0)));
+objects.push(new GravObject("EARTH", 1, 12.76, new Vector2(0,-16000), new Vector2(-500,0)));
+objects.push(new GravObject("EARTH_MOON", 0.01, 0.03, new Vector2(0,-16100), new Vector2(-450,2)));
+objects.push(new GravObject("MARS", 0.11, 6.794, new Vector2(0,20000), new Vector2(600,0)));
+objects.push(new GravObject("JUPITER", 31.783, 142.984, new Vector2(0,30000), new Vector2(300,0)));
+// objects.push(new GravObject("SATURN", 95.16, 120636, new Vector2(), new Vector2()));
+// objects.push(new GravObject("URANUS", 14.54, 51118, new Vector2(), new Vector2()));
+// objects.push(new GravObject("NEPTUNE", 17.15, 48528, new Vector2(), new Vector2()));
 
-var objects = [];
+// objects.push(new GravObject("test", 50, 50, new Vector2(-500,-200), new Vector2(150,30 0)));
 
-objects.push(new GravObject("test", 50, 50, new Vector2(-500,-200), new Vector2(150,300)));
-objects.push(new GravObject("test", 100, 100, new Vector2(200,-200), new Vector2(),true));
-objects.push(new GravObject("test", 10, 10, new Vector2(-600,-600), new Vector2(0,0)));
 // objects.push(new GravObject("test", 1000, 1000, new Vector2(9000,0), new Vector2()));
 // objects.push(new GravObject("test", 70, 70, new Vector2(0,400), new Vector2(-200,0)));
-
-
-
 
 function hookListeners(){
 	canvas.addEventListener("mousedown", function(event){mouseData.mousedown = true},false);
@@ -50,30 +51,17 @@ function keyManagment(event){
 	}
 	event.preventDefault();
 }
-function addObject_Button(){
-	var option = document.createElement("option");
-	if(NameTextBox.value != ""){
-		option.text = NameTextBox.value;
-	}else{
-		unnamedCount += 1;
-		option.text = "unnamed_"+unnamedCount;
-		
+btn.onclick = function(){
+	modal.style.display = "block";
+	time.stop = true;
+}
+close.onclick = function(){
+	modal.style.display = "none";
+	time.stop = false;
+}
+window.onclick = function(event){
+	if(event.target == modal){
+		time.stop = false;
+		modal.style.display ="none";
 	}
-	objectSelect.add(option);
-	objects.unshift(new GravObject(NameTextBox.value == "" ? ("unnamed_"+unnamedCount) : NameTextBox.value,
-								MassTextBox.value, RadiusTextBox.value,
-								new Vector2(parseFloat(PositionXTextBox.value),parseFloat(PositionYTextBox.value)),
-								new Vector2(parseFloat(VelocityXTextBox.value),parseFloat(VelocityYTextBox.value))
-								));
-	objectSelect.selectedIndex = objectSelect.options.length-1;
-	console.log(objectSelect.selectedIndex);
-	console.log(objects)
-}
-function removeObject_Button(){
-	objects.splice(objectSelect.selectedIndex,1);
-	objectSelect.remove(objectSelect.selectedIndex);
-}
-
-objectSelect.onchange = function(){
-	console.log(objectSelect.selectedIndex);	
 }
