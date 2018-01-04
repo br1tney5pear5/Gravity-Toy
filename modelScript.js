@@ -1,14 +1,16 @@
-class Time{
+  class Time{
 	constructor(){
 		this.startTime = new Date().getTime(),	
 		this.lastTime = 0;
 		this.stop = false;
+		this.timeSpeed = 4;
 	}
-	getTime(){return Math.abs(this.startTime - new Date().getTime());}
+	toggle(){this.stop = !this.stop;}
+	getTime(){return 4*Math.abs(this.startTime - new Date().getTime());}
 	getTimeInSeconds(){return Math.abs(this.startTime - new Date().getTime())/1000;}
 	deltaTime(){
 		if(this.stop == false){
-			return Math.abs(this.lastTime - this.getTime());
+			return this.timeSpeed * Math.abs(this.lastTime - this.getTime());
 		}else{
 			return 0;
 		}
@@ -52,9 +54,10 @@ class GravObject{
 		this.static = _isStatic;
 		this.active = _isActive;
 	}
+	toggle(){this.active = !this.active;}
 	getInfo(){
 		return new Array("Name:------ " + this.name.toString(),
-						 "Radius----- " + this.radius.toString(),
+						 "Radius----- " + Math.round(this.radius).toString(),
 						 "Mass------- " + this.mass.toString(),
 		 				 "Position--- " + Math.round(this.position.x).toString() + " : " + Math.round(this.position.y).toString(),
 		 				 "Velocity--- " + Math.round(this.velocity.x).toString()  + " : " +  Math.round(this.velocity.y).toString(),
@@ -70,7 +73,8 @@ class Plotter{
 		this.cam = _camera;
 		this.lastPos = new Vector2();
 		this.relativeMid = new Vector2(_canvas.width/2- _camera.position.x, _canvas.height/2 - _camera.position.y)
-		this.fontSize = 12;
+		this.unitIndicatorLength = 10;
+		this.fontSize = 18;
 		this.textMargin = new Vector2(5,5);
 		this.infoTableMargin = 30;
 	}
@@ -91,10 +95,12 @@ class Plotter{
 		this.context.moveTo(this.relativeMid.x + pos.x * this.cam.zoom, this.relativeMid.y + pos.y * this.cam.zoom);
 		this.lastPos = new Vector2(this.relativeMid.x + pos.x * this.cam.zoom, this.relativeMid.y + pos.y * this.cam.zoom);
 	 }
-	drawLineFromTo(startPos, endPos, color , alpha=1, dashFill=0, dashHole=0){
+	clear(){
+		this.context.clearRect(0,0, this.canv.width, this.canv.height);
+	}
+	drawLineFromTo(startPos, endPos){
 		var transformedStartPos = this.transformPositon(startPos);
 		this.context.beginPath();
-		this.setStyle(color,alpha, dashFill,dashHole);
 		this.context.moveTo(transformedStartPos.x,transformedStartPos.y);
 		this.context.lineTo(transformedStartPos.x + endPos.x * this.cam.zoom, transformedStartPos.y+ endPos.y * this.cam.zoom );
 		this.lastPos = new Vector2(transformedStartPos.x + endPos.x * this.cam.zoom, transformedStartPos.y+ endPos.y * this.cam.zoom );
@@ -106,16 +112,25 @@ class Plotter{
 		this.lastPos = new Vector2(transformedStartPos.x + endPos.x * this.cam.zoom, transformedStartPos.y+ endPos.y * this.cam.zoom );
 		if(_fill){this.context.fill()}else{this.context.stroke();}
 	}
-	drawArc(startPos, radius, startAngle= 0, endAngle = Math.PI*2, color, alpha=1, dashFill=0, dashHole=0){
+	drawArc(startPos, radius, startAngle= 0, endAngle = Math.PI*2){
 		var transformedStartPos = this.transformPositon(startPos);
 		this.context.beginPath();
-		this.setStyle(color,alpha, dashFill,dashHole);
 		this.context.arc(transformedStartPos.x,transformedStartPos.y, radius *  this.cam.zoom, startAngle, endAngle);
+		this.context.stroke();
+	}
+	
+	drawReferenceSystem(){
+		this.context.beginPath();
+		this.context.moveTo(0, this.relativeMid.y);
+		this.context.lineTo(this.canv.width,this.relativeMid.y);
+		this.context.moveTo(this.relativeMid.x, 0);
+		this.context.lineTo(this.relativeMid.x, this.canv.height);
+		this.context.moveTo(this.canv.width/4, this.relativeMid.y-this.unitIndicatorLength);
+		this.context.lineTo(this.canv.width/4,this.relativeMid.y+this.unitIndicatorLength);
 		this.context.stroke();
 	}
 	drawGravObjectInfo(object){ //its complicated!
 		var flip = new Vector2(false,false);
-
 		var transformedStartPos = this.transformPositon(Vector2.addVectors(object.position, new Vector2(object.radius,0)));
 		var info = object.getInfo();
 		this.context.font = this.fontSize.toString() + "px monospace";
@@ -128,16 +143,16 @@ class Plotter{
 		var monospaceFontRatio = 0.55;
 		this.drawRect(undefined,new Vector2((longestWord.length * this.fontSize*monospaceFontRatio+ this.textMargin.x*2)/this.cam.zoom,
 											 (-(flip.y+flip.y-1)*(info.length*(this.fontSize+this.textMargin.y) + this.fontSize))/this.cam.zoom));
-		console.log(longestWord.length);
 		
 	}
 }
-var canvas = document.getElementById("canvas"); canvas.width = 955; canvas.height = 800; canvas.style = "border: 1px solid";
+var canvas = document.getElementById("canvas"); canvas.width = 855; canvas.height = 800; canvas.style = "border: 1px solid";
 var ctx = canvas.getContext("2d");
-var gridSize = 500;
+var gridSize = 2000;
 var mouseData = {mousedown: false, lastPos: undefined, delta: undefined};
-var camera = {position: new Vector2(), zoom: 1/8, zoomFactor: 2, shiftFactor: 100};
+var camera = {position: new Vector2(), zoom: 1/128, zoomFactor: 2, shiftFactor: 100};
 var time = new Time();
+var objects = [];
 plotter = new Plotter(canvas, camera);
 flags = {alt: false};
 const G = 6.67 * Math.pow(10,-1);
