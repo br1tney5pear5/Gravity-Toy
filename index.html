@@ -2,37 +2,27 @@
 <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 <link rel="stylesheet" type="text/css" href="style.css">
 <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
 </head>
 <body>
 <div id="container">
 	<div  id="header">
-		<a id="link" href="https://github.com/kacperkokot">Kacper Kokot</a>
+		<a id="link" href="https://github.com/kacperkokot">Kacper Kokot - 2017</a>
 	</div>
 
 	<div id="canvasHolder">
 		<canvas id="canvas"></canvas>
-	</div>
 
-
-<!-- 	<div id="UI">
-		<button onclick="addObject_Buinteria.tton()" id="addObject">Add</button>
-		<button onclick="removeObject_Button()" id="removeObject">Remove</button>
-		<select id="objectSelect"></select>
-		<input type="text" id="NameTextBox"  placeholder="Object Name">
-		<p class="leftText">Mass</p>
-		<input class="rightTextBox" type="text" id="MassTextBox"  placeholder="Mass">
-		<p class="leftText">Radius</p>
-		<input class="rightTextBox" type="text" id="RadiusTextBox"  placeholder="Radius">
-		<p class="leftText">Position</p>
-		<input class="coordinates" type="text" id="PositionXTextBox"  placeholder="X">
-		<input class="coordinates" type="text" id="PositionYTextBox"  placeholder="Y">
-		<p class="leftText">Velocity</p>
-		<input class="coordinates" type="text" id="VelocityXTextBox"  placeholder="X">
-		<input class="coordinates" type="text" id="VelocityYTextBox"  placeholder="Y">
 	</div>
-	 -->
+	<button id="button"> What is it? </button>
+	
+	<div id="modal" class="modal">
+  		<div class="modalContent">
+    	<span class="close">&times;</span>
+    	<p>Some text in the Modal..</p>
+  		</div>
+	</div>
 </div>
-
 
 <script src="modelScript.js"></script>
 <script src="controllerScript.js"></script>
