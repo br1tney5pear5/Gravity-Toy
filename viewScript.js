@@ -1,18 +1,7 @@
 function redraw(){	
-plotter.drawLineFromTo(new Vector2(-1000,-100), new Vector2(-100,-100))
-//drawing refrence system
-	ctx.clearRect(0,0, canvas.width,canvas.height);
-	
-//center
-	ctx.beginPath();
-	ctx.globalAlpha = 0.5;
-	ctx.strokeStyle = "#000FFF";
-	ctx.setLineDash([]);
-	ctx.moveTo(0, plotter.relativeMid.y);
-	ctx.lineTo(canvas.width,plotter.relativeMid.y);
-	ctx.moveTo(plotter.relativeMid.x, 0);
-	ctx.lineTo(plotter.relativeMid.x, canvas.height);
-	ctx.stroke();
+	plotter.clear();
+	plotter.setStyle("#000FFF", 0.5, 0,0);
+	plotter.drawReferenceSystem(); 
 //grid
 	var rectCount = Math.floor((camera.position.magnitude()/camera.zoom + canvas.width/camera.zoom)/gridSize);
 	for(let i = 0; i < (rectCount > 100 ? 100 : rectCount); i += 1){
@@ -25,14 +14,13 @@ plotter.drawLineFromTo(new Vector2(-1000,-100), new Vector2(-100,-100))
 	
 	for(let i = 0; i < objects.length; i += 1){
 		if(objects[i].active == true){
-			//context menu
 			plotter.setStyle("#000000", 1, 0,0);
-
 			if(flags.altPressed == true){
 				plotter.drawGravObjectInfo(objects[i]);
 			}
-			plotter.drawArc(objects[i].position, objects[i].radius,0, 2*Math.PI, "#000000");
-			plotter.drawLineFromTo(objects[i].position, objects[i].velocity, "#FFF000");
+			plotter.drawArc(objects[i].position, objects[i].radius,0, 2*Math.PI);
+			plotter.setStyle("#FFF000", 1, 0,0);
+			plotter.drawLineFromTo(objects[i].position, objects[i].velocity);
 			//drawing acceleration vector //not implemented yet
 			//drawing orbit evaluation //not implemented yet
 
@@ -56,7 +44,6 @@ plotter.drawLineFromTo(new Vector2(-1000,-100), new Vector2(-100,-100))
 						var index2 = objects.indexOf(objects[i].radius <= objects[j].radius ? objects[i] : objects[j]);
 						objects[index1].radius = Math.sqrt(Math.pow(objects[index1].radius,2) + Math.pow(objects[index2].radius,2));
 						var massRatio = new Vector2(objects[index1].mass, objects[index2].mass).cos();
-						console.log(massRatio + (1-massRatio));
 						objects[index1].velocity.x = objects[index1].velocity.x*massRatio + objects[index2].velocity.x*(1-massRatio);
 						objects[index1].velocity.y =  objects[index1].velocity.y*massRatio + objects[index2].velocity.y*(1-massRatio);
 						// console.log(objects[index1].radius);
@@ -67,8 +54,13 @@ plotter.drawLineFromTo(new Vector2(-1000,-100), new Vector2(-100,-100))
 				}
 			}
 		}else{
-			plotter.drawArc(objects[i].position, objects[i].radius,0, 2*Math.PI, "#000000");
-			plotter.drawLineFromTo(objects[i].position, objects[i].velocity, "#FFF000");
+			plotter.setStyle("#000000", 1, 3,3);
+			if(flags.altPressed == true){
+				plotter.drawGravObjectInfo(objects[i]);
+			}
+			plotter.drawArc(objects[i].position, objects[i].radius,0, 2*Math.PI);
+			plotter.setStyle("#FFF000", 1, 3,3);
+			plotter.drawLineFromTo(objects[i].position, objects[i].velocity);
 
 		}		
 	}
