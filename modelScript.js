@@ -7,7 +7,7 @@
 	}	
 	toggle(){this.stop = !this.stop;}
 	getTime(){return this.speed*Math.abs(this.startTime - new Date().getTime());}
-	getTimeInSeconds(){return Math.abs(this.startTime - new Date().getTime())/1000;}
+	getTimeInSeconds(){return this.getTime()/1000;}
 	deltaTime(){
 		if(this.stop == false){
 			return this.speed * Math.abs(this.lastTime - this.getTime());
@@ -99,12 +99,12 @@ class Plotter{
 		else{this.context.globalAlpha = 0;}
 		this.context.setLineDash([dashFill,dashHole]);
 	}
-	setSL(message,time){
-		this.SLMessage = message.toString(); this.SLTime = time;
+	setSL(message,_time= 1){
+		this.SLMessage = message.toString(); this.SLTime = _time*time.speed;
 	}
 	onScreenLog(deltaTime){
 		if(this.SLTime-deltaTime > 0.1){
-			this.SLTime -= deltaTime ;
+			this.SLTime -= deltaTime/time.speed ;
 		}else{
 			this.SLTime = 0;
 		}		
@@ -181,7 +181,11 @@ class Plotter{
 		
 	}
 }
-var canvas = document.getElementById("canvas"); canvas.width = 855; canvas.height = 800; canvas.style = "border: 1px solid";
+var canvas = document.getElementById("canvas");
+
+
+
+canvas.style = "border: 1px solid";
 var ctx = canvas.getContext("2d");
 var gridSize = 2000;
 var mouseData = {mousedown: false, lastPos: undefined, delta: undefined};
@@ -190,14 +194,26 @@ var time = new Time();
 var objects = [];
 var objectsLimit = 500;
 plotter = new Plotter(canvas, camera);
-flags = {alt: false};
+flags = {alt: false, helpPageActive: false};
 var G = 20;
+function resizeCanvas(){
+	canvas.width = document.body.scrollWidth * 0.9;
+	canvas.height = document.body.scrollHeight * 0.9;	
+	
+}
+window.onresize = function(event){
+	plotter.setSL("Canvas resized", 1);
+	canvas.width = event.target.outerWidth * 0.9;
+	canvas.height = event.target.outerHeight * 0.9; 
+	}
 
 window.onload = function(){
+	resizeCanvas();
 	var ua = navigator.userAgent.toLowerCase();
 	var isAndroid = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
-	if(isAndroid) {alert("This app may not work correctly on your device!");}
+	if(isAndroid) {alert("This app may not work correctly on your device! Please use PC.");}
 	requestAnimationFrame(redraw);
 	hookListeners();
 }
+
 //

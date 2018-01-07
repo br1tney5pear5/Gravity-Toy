@@ -5,6 +5,7 @@ function redraw(){
 	plotter.drawReferenceSystem(); 
 //grid
 	
+	
 	var rectCount = Math.floor((camera.position.magnitude()/camera.zoom + canvas.width/camera.zoom)/gridSize);
 	for(let i = 0; i < (rectCount > 100 ? 100 : rectCount); i += 1){
 		ctx.setLineDash([1, 9]);

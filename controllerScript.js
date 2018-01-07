@@ -8,7 +8,7 @@ var unnamedCount = -1;
 function clear(){
 	objects.length = 0;
 }
-function randomSpawn(howMany = 100, minSize = 10, maxSize = 1000, distanceSpan = 70000, velocitySpan = 50000){
+function randomSpawn(howMany = 100, minSize = 10, maxSize = 1000, distanceSpan = 70000 ,velocitySpan = 50000){
 	log("Spawned " + howMany + " random objects.")
 	for(let i = 0; i < howMany; i+=1){
 		if(objects.length >= objectsLimit){
@@ -19,8 +19,8 @@ function randomSpawn(howMany = 100, minSize = 10, maxSize = 1000, distanceSpan =
 		//all those unnessesary variables for code readability 
 
 		var translatedDistanceSpan = distanceSpan ;
-		if(1/camera.zoom >= 1024){
-			translatedDistanceSpan =  distanceSpan * (1/(1/1024)/100);
+		if(1/camera.zoom >= 4096){
+			translatedDistanceSpan =  distanceSpan * (1/(1/4096)/100);
 		}else if(1/camera.zoom <= 8){
 			translatedDistanceSpan =  distanceSpan * (1/(1/8)/100);
 		}else{
@@ -67,10 +67,19 @@ function cameraZoom(sideFactor){
 	plotter.setSL("zoom - 1/" + 1/camera.zoom, 1);
 
 }
+function changeTimeSpeed(factor){
+	time.setLastTime();	time.stop = true;
+	if(factor == true){time.speed += 0.1;}
+	else{time.speed -= 0.1;}
+	time.speed = Math.round(time.speed*100)/100;
+	plotter.setSL("Time Speed - " + time.speed);
+	time.stop = false;
+}
 function log(message){
 	console.log(message);
 }
 function keyManagment(event){
+	if(flags.helpPageActive & event.keyCode != 113){return;}
 	switch(event.keyCode){
 		case 18: flags.altPressed = !flags.altPressed; break;
 		case 32: time.stop = !time.stop; break; //space
@@ -80,40 +89,49 @@ function keyManagment(event){
 		case 38: quantizedCameraShift(new Vector2(0,-1)); break; //up
 		case 39: quantizedCameraShift(new Vector2(1,0));  break; //right
 		case 40: quantizedCameraShift(new Vector2(0,1));  break; //down
-		case 86: break; //v
-		case 66: randomSpawn(10); break; //b
-		case 78: randomSpawn(100); break; //n
-		case 77: randomSpawn(100); break; //m
+		case 86: randomSpawn(100, 10,1000); break; //v
+		case 66: randomSpawn(10, 100, 10000, 70000, 100000); break; //b
+		case 78: objects.push(new GravObject("Static_obj", 5000, 5000,Vector2.multiplyVectorByScalar(camera.position, 1/camera.zoom), new Vector2(), true, true )); plotter.setSL("Static object spawned"); break; //n
+		case 77: randomSpawn(50, 10, 1000 , 70000, 200000 );  break; //m
 		case 67: clear(); break; //c
 		case 113: toggleHelp(); break; //f2
-		case 78: break; //n
-		case 78: break; //n
-		case 78: break; //n
-		case 78: break; //n
-		case 78: break; //n
+		case 188: changeTimeSpeed(false); break; //</,
+		case 190: changeTimeSpeed(true); break; //>/.
+		case 219: break; //[
+		case 221: break; //]
+		case 82: resizeCanvas(); break; //r
 		case 78: break; //n
 		default: return; break;	
 	}
 	event.preventDefault();
 }
+
+//it could be shorter ofc but i am honestly too tired to corect this
 btn.onclick = function(){
 	modal.style.display = "block";
+	flags.helpPageActive = true;
+	
 	// time.stop = true;
 }
 close.onclick = function(){
 	modal.style.display = "none";
+	flags.helpPageActive = false;
 	// time.stop = false;
 }
 window.onclick = function(event){
 	if(event.target == modal){
 		// time.stop = false;
 		modal.style.display ="none";
+		flags.helpPageActive = false;
 	}
 }
 function toggleHelp(){
 	if(modal.style.display == "block"){
 		modal.style.display ="none";
+		flags.helpPageActive = false;
 	}else{
 		modal.style.display = "block";
+		flags.helpPageActive = true;
+		
 	}
 }

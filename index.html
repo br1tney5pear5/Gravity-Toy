@@ -14,70 +14,74 @@
 		<canvas id="canvas"></canvas>
 
 	</div>
-	<button id="button"> What is it? </button>
+	<button id="button"> What is it? (F2)</button>
 	
 	<div id="modal" class="modal">
-  		<div class="modalContent">
+  		<div class="modalContent" id="modalContent" >
     	<span class="close">&times;</span>
     	<p>Hi, this is simple gravity toy i wrote to practice programming in JavaScript.</p>
     	<p>If you want to look at the code, clicking at my name at the top of the page or <a href="https://github.com/kacperkokot">here</a> will take you to my Github profile.</p>
     	<p>If you want to just play with gravity, here are some keyboard controls and corresponding commands in <span class="bluish">bluish</span> colour, if you're kind of person who likes to use console (or something is broken with keyboards controls):</p>
     	<div id="leftModalContent">
     		<p> <span class="key"> Arrows / Left Mouse Button + Mouse </span>	 - Moving the camera around</p>
-    		<p> <span class="key"> Page Up </span>  -  zooming in <span class="bluish">camera.zoom = [value]</span></p>
-    		<p> <span class="key"> Page Down </span>  -  zooming out  <span class="bluish">camera.zoom = [value]</span></p>
-    		<p> <span class="key"> Space</span> -	freezing/unfreezing the time <span class="bluish">time.toggle()</span></p>
+    		<p> <span class="key"> Page Up </span>  -  zooming in <span class="bluish"> camera.zoom = [value]</span></p>
+    		<p> <span class="key"> Page Down </span>  -  zooming out  <span class="bluish"> camera.zoom = [value]</span></p>
+    		<p> <span class="key"> Space</span> -	freezing/unfreezing the time <span class="bluish"> time.toggle()</span></p>
     		
     		<div style="height: 103px; max-height: 105px;">
     			<div style="float: left; height: 100%; ">
-    				<p> <span class="key"> V </span>  -  spawning 10 random objects  
-    				<p> <span class="key"> B </span>  -  spawning 10 random objects  
-    				<p> <span class="key"> N </span>  -  spawning 100 random objects  
-    				<p> <span class="key"> M </span>  -  spawning 10 random objects  
+    				<p> <span class="key"> V </span>  -  spawning 100 random small objects  </p>
+    				<p> <span class="key"> B </span>  -  spawning 10 random big objects  </p>
+    				<p> <span class="key"> N </span>  -  spawning static object <span class="bluish"> hold</span></p>
+    				<p> <span class="key"> M </span>  -  spawning 50 highspeed objects  </p>
     			</div>
 
     			<div style="float: left; border-left: solid; border-width: thin; margin-left: 15px; height: 100%"></div>
     			
-    			<div style= "float: left; margin-top:15px; margin-left:15px; width: auto; height: 100%; max-width: 300px; ">
-					<span class="bluish">randomSpawn( [how many?]* , [minimum size]* , [maximum size]* , [distance span]* , [velocity span]* )</span></p>
-					<span class="bluishNote">"*" means that these parameters are default, and you don't have to specify them</span></p>
+    			<div style= "float: left; margin-top:5px; margin-left:15px; width: auto; height: 100%; max-width: 300px; ">
+					<span class="bluish"> randomSpawn( [how many?]* , [minimum size]* , [maximum size]* , [distance span]* , [velocity span]* )</span></p>
+					<span class="bluishNote"> "*" means that these parameters are default, and you don't have to specify them</span></p>
+					<span class="bluishNote"> spawing area is zoom dependent.</span></p>
 				</div>
 			</div>
 			<div style="clear:both" ></div>
 
     		<p> <span class="key"> C </span>  -  Deleting all objects from scene <span class="bluish">clear()</span></p>
 
-    		<div style="height: 60px; max-height: 60px;">
+    		<div style="height: 80px; max-height: 80px;">
     			<div style="float: left; height: 100%; ">
-    				<p> <span class="key"> > </span>  -  Speeding the time <span class="bluish">time.speed = [value]</span></p>
-    				<p> <span class="key"> < </span>  -  Slowing the time <span class="bluish">time.speed = [value]</span></p>
+    				<p> <span class="key"> > </span>  -  Speeding the time <span class="bluish"> time.speed = [value]</span></p>
+    				<p> <span class="key"> < </span>  -  Slowing the time <span class="bluish"> time.speed = [value]</span></p>
     			</div>
 
     			<div style="float: left; border-left: solid; border-width: thin; margin-left: 15px; height: 100%"></div>
     			
-    			<div style= "float: left; margin-top:5px; margin-left:15px; width: auto; height: 100%; max-width: 250px; ">
+    			<div style= "float: left; margin-top:0px; margin-left:15px; width: auto; height: 100%; max-width: 250px; ">
 					<p><span class="red">Increase in time speed will also increase calculations inaccuracy!</span></p>
+					<p><span class="bluishNote">Does not work yet.</span></p>
 				</div>
 			</div>
 			<div style="clear:both" ></div>
 
-			<div style="height: 60px; max-height: 60px;">
+			<div style="height: 80px; max-height: 80px;">
     			<div style="float: left; height: 100%; ">
-    				<p> <span class="key"> ] </span>  -  Increasing G by 1 <span class="bluish">G = [value]</span></p>
-    				<p> <span class="key"> [ </span>  -  Decreasing G by 1 <span class="bluish">G = [value]</span></p>
+    				<p> <span class="key"> ] </span>  -  Increasing G by 1 <span class="bluish"> G = [value]</span></p>
+    				<p> <span class="key"> [ </span>  -  Decreasing G by 1 <span class="bluish"> G = [value]</span></p>
     			</div>
 
     			<div style="float: left; border-left: solid; border-width: thin; margin-left: 15px; height: 100%"></div>
     			
     			<div style= "float: left; margin-top:auto; margin-left:15px; width: auto; height: 100%; max-width: 250px; ">
-					<p><span class="bluishNote">Gravitational "constant" in my simulation equals 10 (instead of real life 6.674×10^−11), Higher G causes stronger attraction.</span></p>
-					<p><span class="bluishNote"></span></p>
+					<p><span class="bluishNote"> Gravitational "constant" in my simulation equals 15 (instead of real life 6.674×10^−11), Higher G causes stronger attraction.</span></p>
+					<p><span class="bluishNote"> Also does not work yet.</span></p>
 				</div>
 			</div>
-
-    		
     		<div style="clear:both" ></div>
-    		<p> <span class="key"> F11 </span>  -  Full screen mode in most browsers</p>
+    		<p> <span class="key"> Alt </span>  -  Show objects info</p>
+    		<p> <span class="key"> Hold R </span>  -  Resize canvas to proper size <span class="bluishNote"> If it is not sized well (which happens)</span></p>
+    		<p> <span class="key"> F5 </span>  -  Reload page <span class="bluishNote"> When something breaks down (like when you change tab for a while)</span></p>
+    		<p> <span class="key"> F11 </span>  -  Full screen shortcut mode in most browsers</p>
+    		<p> <span class="key"> F2 </span>  -  Help<span class="bluishNote"> This window</span></p>
   
     	</div>
   		<p>Have Fun!</p>
