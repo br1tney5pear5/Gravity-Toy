@@ -3,14 +3,14 @@
 		this.startTime = new Date().getTime(),	
 		this.lastTime = 0;
 		this.stop = false;
-		this.timeSpeed = 1;
+		this.speed = 1;
 	}	
 	toggle(){this.stop = !this.stop;}
-	getTime(){return this.timeSpeed*Math.abs(this.startTime - new Date().getTime());}
+	getTime(){return this.speed*Math.abs(this.startTime - new Date().getTime());}
 	getTimeInSeconds(){return Math.abs(this.startTime - new Date().getTime())/1000;}
 	deltaTime(){
 		if(this.stop == false){
-			return this.timeSpeed * Math.abs(this.lastTime - this.getTime());
+			return this.speed * Math.abs(this.lastTime - this.getTime());
 		}else{
 			return 0;
 		}
@@ -24,7 +24,7 @@ class Vector2{
 	magnitude() {return Math.sqrt(Math.pow(this.x,2)+Math.pow(this.y,2));}
 	sin(){return this.y/this.magnitude();}
 	cos(){return this.x/this.magnitude();}
-
+	multiplyByScalar(scalar){this.x *= scalar; this.y *= scalar; return new Vector2(this.x,this.y);}
 	static addVectors(){
 		var temp = new Vector2();
 		for(let i = 0; i < arguments.length; i += 1){
@@ -47,7 +47,7 @@ class GravObject{
 		this.name = _Name;
 		this.mass = _Mass;
 		this.radius = _Radius;
-		this.color = "#0000000";//for later
+		this.color = plotter.randomColor();
 		this.position = new Vector2(_InitialPosition.x, _InitialPosition.y );
 		this.velocity = new Vector2(_InitialVelocity.x, _InitialVelocity.y );
 		this.acceleration = new Vector2();
@@ -65,6 +65,7 @@ class GravObject{
 		  				 "isActive?-- " + this.active.toString());
 	}
 } 
+
 class Plotter{
 	//its yet to be corrected
 	constructor(_canvas, _camera){
@@ -79,9 +80,10 @@ class Plotter{
 		this.textMargin = new Vector2(5,5);
 		this.infoTableMargin = 30;
 		this.SLFontSize = 28;
-		this.SLMessage = "message";
-		this.SLTime = 1;
+		this.SLMessage = "";
+		this.SLTime = 0;
 	}
+	randomColor(){return "rgb(" +Math.round( Math.random()*255) + ", " + Math.round( Math.random()*255)+ ", "+Math.round( Math.random()*255) + " )"};
 	recalMid() {this.relativeMid = new Vector2(this.canv.width/2-this.cam.position.x, this.canv.height/2-this.cam.position.y);}
 	transformPositon(pos){
 		if(pos != undefined){
@@ -91,12 +93,10 @@ class Plotter{
 		}
 	}
 	setStyle(color,alpha,dashFill,dashHole){
+		this.context.fillStyle = color;
 		this.context.strokeStyle = color;
-		if(!isNaN(alpha)&isFinite(alpha)){
-			this.context.globalAlpha = alpha; 
-		}else{
-			this.context.globalAlpha = 0;
-		}
+		if(isFinite(alpha) & !isNaN(alpha)){this.context.globalAlpha = alpha;}
+		else{this.context.globalAlpha = 0;}
 		this.context.setLineDash([dashFill,dashHole]);
 	}
 	setSL(message,time){
@@ -119,8 +119,9 @@ class Plotter{
 		this.context.moveTo(this.relativeMid.x + pos.x * this.cam.zoom, this.relativeMid.y + pos.y * this.cam.zoom);
 		this.lastPos = new Vector2(this.relativeMid.x + pos.x * this.cam.zoom, this.relativeMid.y + pos.y * this.cam.zoom);
 	 }
-	clear(){
-		this.context.clearRect(0,0, this.canv.width, this.canv.height);
+	clear(alpha){
+		this.setStyle("rgb(152,152,152)", alpha,0,0);
+		this.context.fillRect(0,0, this.canv.width, this.canv.height);
 	}
 	drawLineFromTo(startPos, endPos){
 		this.recalMid();
@@ -138,12 +139,17 @@ class Plotter{
 		this.lastPos = new Vector2(transformedStartPos.x + endPos.x * this.cam.zoom, transformedStartPos.y+ endPos.y * this.cam.zoom );
 		if(_fill){this.context.fill()}else{this.context.stroke();}
 	}
-	drawArc(startPos, radius, startAngle= 0, endAngle = Math.PI*2){
+	drawArc(startPos, radius, startAngle= 0, endAngle = Math.PI*2, _fill =false){
 		this.recalMid();
 		var transformedStartPos = this.transformPositon(startPos);
 		this.context.beginPath();
 		this.context.arc(transformedStartPos.x,transformedStartPos.y, radius *  this.cam.zoom, startAngle, endAngle);
-		this.context.stroke();
+		if(_fill){
+			this.context.fill();
+		}else{
+			this.context.stroke();
+		}
+
 	}
 	
 	drawReferenceSystem(){
@@ -182,11 +188,15 @@ var mouseData = {mousedown: false, lastPos: undefined, delta: undefined};
 var camera = {position: new Vector2(), zoom: 1/128, zoomFactor: 2, shiftFactor: 100};
 var time = new Time();
 var objects = [];
+var objectsLimit = 500;
 plotter = new Plotter(canvas, camera);
 flags = {alt: false};
-var G = 10;
+var G = 20;
 
 window.onload = function(){
+	var ua = navigator.userAgent.toLowerCase();
+	var isAndroid = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
+	if(isAndroid) {alert("This app may not work correctly on your device!")
 	requestAnimationFrame(redraw);
 	hookListeners();
 }

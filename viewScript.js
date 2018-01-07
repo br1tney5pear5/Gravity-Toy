@@ -1,6 +1,6 @@
 function redraw(){	
 
-	plotter.clear();
+	plotter.clear(1);
 	plotter.setStyle("#000FFF", 0.5, 0,0);
 	plotter.drawReferenceSystem(); 
 //grid
@@ -20,10 +20,12 @@ function redraw(){
 			if(flags.altPressed == true){
 				plotter.drawGravObjectInfo(objects[i]);
 			}
-
 			plotter.drawArc(objects[i].position, objects[i].radius,0, 2*Math.PI);
+			plotter.setStyle(objects[i].color, 0.3, 0,0);
+			plotter.drawArc(objects[i].position, objects[i].radius,0, 2*Math.PI,true);
+			
 			plotter.setStyle("#FFF000", 0.5, 0,0);
-			plotter.drawLineFromTo(objects[i].position, objects[i].velocity);
+			plotter.drawLineFromTo(objects[i].position, Vector2.multiplyVectorByScalar(objects[i].velocity, 0.2));
 			//drawing orbit evaluation //not implemented yet
 
 			for(let j = 0; j < objects.length; j += 1){
