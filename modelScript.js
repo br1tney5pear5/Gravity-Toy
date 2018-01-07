@@ -3,10 +3,10 @@
 		this.startTime = new Date().getTime(),	
 		this.lastTime = 0;
 		this.stop = false;
-		this.timeSpeed = 4;
-	}
+		this.timeSpeed = 1;
+	}	
 	toggle(){this.stop = !this.stop;}
-	getTime(){return 4*Math.abs(this.startTime - new Date().getTime());}
+	getTime(){return this.timeSpeed*Math.abs(this.startTime - new Date().getTime());}
 	getTimeInSeconds(){return Math.abs(this.startTime - new Date().getTime())/1000;}
 	deltaTime(){
 		if(this.stop == false){
@@ -75,8 +75,12 @@ class Plotter{
 		this.relativeMid = new Vector2(_canvas.width/2- _camera.position.x, _canvas.height/2 - _camera.position.y)
 		this.unitIndicatorLength = 10;
 		this.fontSize = 18;
+		
 		this.textMargin = new Vector2(5,5);
 		this.infoTableMargin = 30;
+		this.SLFontSize = 28;
+		this.SLMessage = "message";
+		this.SLTime = 1;
 	}
 	recalMid() {this.relativeMid = new Vector2(this.canv.width/2-this.cam.position.x, this.canv.height/2-this.cam.position.y);}
 	transformPositon(pos){
@@ -88,8 +92,28 @@ class Plotter{
 	}
 	setStyle(color,alpha,dashFill,dashHole){
 		this.context.strokeStyle = color;
-		this.context.globalAlpha = alpha; 
+		if(!isNaN(alpha)&isFinite(alpha)){
+			this.context.globalAlpha = alpha; 
+		}else{
+			this.context.globalAlpha = 0;
+		}
 		this.context.setLineDash([dashFill,dashHole]);
+	}
+	setSL(message,time){
+		this.SLMessage = message.toString(); this.SLTime = time;
+	}
+	onScreenLog(deltaTime){
+		if(this.SLTime-deltaTime > 0.1){
+			this.SLTime -= deltaTime ;
+		}else{
+			this.SLTime = 0;
+		}		
+		this.setStyle("#000000", Math.log10(Math.abs(this.SLTime))+1,0,0);
+		if(this.SLMessage != undefined){
+			this.context.font = this.SLFontSize.toString() + "px monospace";
+			var offset = this.SLMessage.length / 4 * this.SLFontSize;
+			this.context.fillText(this.SLMessage,canvas.width/2-offset,this.SLFontSize );
+		}
 	}
 	moveCursorTo(pos){
 		this.context.moveTo(this.relativeMid.x + pos.x * this.cam.zoom, this.relativeMid.y + pos.y * this.cam.zoom);
@@ -99,6 +123,7 @@ class Plotter{
 		this.context.clearRect(0,0, this.canv.width, this.canv.height);
 	}
 	drawLineFromTo(startPos, endPos){
+		this.recalMid();
 		var transformedStartPos = this.transformPositon(startPos);
 		this.context.beginPath();
 		this.context.moveTo(transformedStartPos.x,transformedStartPos.y);
@@ -107,12 +132,14 @@ class Plotter{
 		this.context.stroke();
 	}
 	drawRect(startPos, endPos, _fill= false){
+		this.recalMid();
 		var transformedStartPos = this.transformPositon(startPos);
 		this.context.rect(transformedStartPos.x, transformedStartPos.y, endPos.x * this.cam.zoom, endPos.y * this.cam.zoom);
 		this.lastPos = new Vector2(transformedStartPos.x + endPos.x * this.cam.zoom, transformedStartPos.y+ endPos.y * this.cam.zoom );
 		if(_fill){this.context.fill()}else{this.context.stroke();}
 	}
 	drawArc(startPos, radius, startAngle= 0, endAngle = Math.PI*2){
+		this.recalMid();
 		var transformedStartPos = this.transformPositon(startPos);
 		this.context.beginPath();
 		this.context.arc(transformedStartPos.x,transformedStartPos.y, radius *  this.cam.zoom, startAngle, endAngle);
@@ -120,6 +147,7 @@ class Plotter{
 	}
 	
 	drawReferenceSystem(){
+		this.recalMid();
 		this.context.beginPath();
 		this.context.moveTo(0, this.relativeMid.y);
 		this.context.lineTo(this.canv.width,this.relativeMid.y);
@@ -130,6 +158,7 @@ class Plotter{
 		this.context.stroke();
 	}
 	drawGravObjectInfo(object){ //its complicated!
+		this.recalMid();
 		var flip = new Vector2(false,false);
 		var transformedStartPos = this.transformPositon(Vector2.addVectors(object.position, new Vector2(object.radius,0)));
 		var info = object.getInfo();
@@ -155,10 +184,10 @@ var time = new Time();
 var objects = [];
 plotter = new Plotter(canvas, camera);
 flags = {alt: false};
-const G = 6.67 * Math.pow(10,-1);
+var G = 10;
 
 window.onload = function(){
 	requestAnimationFrame(redraw);
 	hookListeners();
 }
-
+//

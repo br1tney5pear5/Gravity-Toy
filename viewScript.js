@@ -1,8 +1,10 @@
 function redraw(){	
+
 	plotter.clear();
 	plotter.setStyle("#000FFF", 0.5, 0,0);
 	plotter.drawReferenceSystem(); 
 //grid
+	
 	var rectCount = Math.floor((camera.position.magnitude()/camera.zoom + canvas.width/camera.zoom)/gridSize);
 	for(let i = 0; i < (rectCount > 100 ? 100 : rectCount); i += 1){
 		ctx.setLineDash([1, 9]);
@@ -10,22 +12,22 @@ function redraw(){
 		ctx.strokeRect(plotter.relativeMid.x-i*tempGridSize, plotter.relativeMid.y-i*tempGridSize, i*tempGridSize*2, i*tempGridSize*2);
 	}
 //==================
-
+	
 	
 	for(let i = 0; i < objects.length; i += 1){
-		if(objects[i].active == true){
+		if( objects[i] != undefined & objects[i].active == true){
 			plotter.setStyle("#000000", 1, 0,0);
 			if(flags.altPressed == true){
 				plotter.drawGravObjectInfo(objects[i]);
 			}
+
 			plotter.drawArc(objects[i].position, objects[i].radius,0, 2*Math.PI);
-			plotter.setStyle("#FFF000", 1, 0,0);
+			plotter.setStyle("#FFF000", 0.5, 0,0);
 			plotter.drawLineFromTo(objects[i].position, objects[i].velocity);
-			//drawing acceleration vector //not implemented yet
 			//drawing orbit evaluation //not implemented yet
 
 			for(let j = 0; j < objects.length; j += 1){
-				if(j != i & objects[j].active == true){
+				if(j != i & objects[j] != undefined & objects[i] != undefined &objects[j].active == true){
 					var distance = new Vector2(objects[i].position.x -objects[j].position.x,objects[i].position.y -objects[j].position.y);
 					var distanceMagnitude = distance.magnitude();
 					
@@ -73,6 +75,8 @@ function redraw(){
 		}
 	}
 //============/======
+
+	plotter.onScreenLog(time.deltaTimeInSeconds());
 	time.setLastTime()
 	requestAnimationFrame(redraw);
 
