@@ -58,7 +58,7 @@ function mouseCameraShift(event){
 	
 }
 function quantizedCameraShift(shift){
-	camera.position = Vector2.addVectors( camera.position,Vector2.multiplyVectorByScalar(shift, camera.shiftFactor));
+	camera.position.add(Vector2.multiplyVectorByScalar(shift, camera.shiftFactor));
 	plotter.setSL("Camera position - x: "+ camera.position.x + ", y: "+ camera.position.y ,1);
 }
 function cameraZoom(sideFactor){
@@ -74,6 +74,16 @@ function changeTimeSpeed(factor){
 	time.speed = Math.round(time.speed*100)/100;
 	plotter.setSL("Time Speed - " + time.speed);
 	time.stop = false;
+}
+function followToggle(){//not working yet
+	var smallestMagnitude = 0;
+	var difference = 0;
+	for(let i = 0; i < objects.length; i++ ){
+		difference = Vector2.multiplyVectorByScalar(camera.position,1/camera.zoom).subtract(objects[i].position);
+		smallestMagnitude = difference < smallestMagnitude ? difference : smallestMagnitude;
+	}
+	log(smallestMagnitude);
+
 }
 function log(message){
 	console.log(message);
@@ -91,6 +101,7 @@ function keyManagment(event){
 		case 40: quantizedCameraShift(new Vector2(0,1));  break; //down
 		case 86: randomSpawn(100, 10,1000); break; //v
 		case 66: randomSpawn(10, 100, 10000, 70000, 100000); break; //b
+		case 70: followToggle(); break; //F
 		case 78: objects.push(new GravObject("Static_obj", 5000, 5000,Vector2.multiplyVectorByScalar(camera.position, 1/camera.zoom), new Vector2(), true, true )); plotter.setSL("Static object spawned"); break; //n
 		case 77: randomSpawn(50, 10, 1000 , 70000, 200000 );  break; //m
 		case 67: clear(); break; //c

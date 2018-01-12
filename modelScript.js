@@ -24,7 +24,9 @@ class Vector2{
 	magnitude() {return Math.sqrt(Math.pow(this.x,2)+Math.pow(this.y,2));}
 	sin(){return this.y/this.magnitude();}
 	cos(){return this.x/this.magnitude();}
-	multiplyByScalar(scalar){this.x *= scalar; this.y *= scalar; return new Vector2(this.x,this.y);}
+	add(vector){this.x +=vector.x; this.y += vector.y; return this;}
+	subtract(vector){this.x -=vector.x; this.y -= vector.y; return this;}
+	multiplyByScalar(scalar){this.x *= scalar; this.y *= scalar; return this;}
 	static addVectors(){
 		var temp = new Vector2();
 		for(let i = 0; i < arguments.length; i += 1){
