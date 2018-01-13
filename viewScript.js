@@ -1,17 +1,18 @@
 function redraw(){	
-
+	resizeCanvas();
 	plotter.clear(1);
 	plotter.setStyle("#000FFF", 0.5, 0,0);
 	plotter.drawReferenceSystem(); 
+	
 //grid
 	
 	
-	var rectCount = Math.floor((camera.position.magnitude()/camera.zoom + canvas.width/camera.zoom)/gridSize);
-	for(let i = 0; i < (rectCount > 100 ? 100 : rectCount); i += 1){
-		ctx.setLineDash([1, 9]);
-		var tempGridSize = gridSize*camera.zoom;
-		ctx.strokeRect(plotter.relativeMid.x-i*tempGridSize, plotter.relativeMid.y-i*tempGridSize, i*tempGridSize*2, i*tempGridSize*2);
-	}
+	// var rectCount = Math.floor((camera.position.magnitude()/camera.zoom + canvas.width/camera.zoom)/gridSize);
+	// for(let i = 0; i < (rectCount > 100 ? 100 : rectCount); i += 1){
+	// 	ctx.setLineDash([1, 9]);
+	// 	var tempGridSize = gridSize*camera.zoom;
+	// 	ctx.strokeRect(plotter.relativeMid.x-i*tempGridSize, plotter.relativeMid.y-i*tempGridSize, i*tempGridSize*2, i*tempGridSize*2);
+	// }
 //==================
 	
 	
@@ -26,7 +27,7 @@ function redraw(){
 			plotter.drawArc(objects[i].position, objects[i].radius,0, 2*Math.PI,true);
 			
 			plotter.setStyle("#FFF000", 0.5, 0,0);
-			plotter.drawLineFromTo(objects[i].position, Vector2.multiplyVectorByScalar(objects[i].velocity, 0.2));
+			plotter.drawLineFromTo(objects[i].position, objects[i].velocity.multiply(0.2,false));
 			//drawing orbit evaluation //not implemented yet
 
 			for(let j = 0; j < objects.length; j += 1){
@@ -78,6 +79,7 @@ function redraw(){
 		}
 	}
 //============/======
+
 
 	plotter.onScreenLog(time.deltaTimeInSeconds());
 	time.setLastTime()

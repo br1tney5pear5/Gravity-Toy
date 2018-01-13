@@ -24,9 +24,28 @@ class Vector2{
 	magnitude() {return Math.sqrt(Math.pow(this.x,2)+Math.pow(this.y,2));}
 	sin(){return this.y/this.magnitude();}
 	cos(){return this.x/this.magnitude();}
-	add(vector){this.x +=vector.x; this.y += vector.y; return this;}
-	subtract(vector){this.x -=vector.x; this.y -= vector.y; return this;}
-	multiplyByScalar(scalar){this.x *= scalar; this.y *= scalar; return this;}
+	not(apply = false){
+		if(apply){this.x = -this.x; this.y = -this.y; return this;}
+		else{return new Vector2(-this.x, -this.y);}
+	}
+	add(vector, apply =  false){
+		if(apply){this.x +=vector.x; this.y += vector.y; return this;}
+		else{return new Vector2(this.x + vector.x, this.y + vector.y);}
+	}
+	subtract(vector, apply = false){
+		if(apply){this.x -=vector.x; this.y -= vector.y; return this;}
+		else{return new Vector2(this.x - vector.x, this.y - vector.y);}
+	}
+	scale(vector, apply = false){
+		if(apply){this.x *= vector.x; this.y *= vector.y; return this;}
+		else{return new Vector2(this.x * vector.x, this.y * vector.y);}
+	}
+	multiply(scalar, apply = false){
+		if(apply){this.x *= scalar; this.y *= scalar; return this;}
+		else{return new Vector2(this.x * scalar, this.y * scalar);}
+	}
+	static random(min = -1, max = 1){return new Vector2(random(min, max), random(min, max));}
+	static one(){return new Vector2(1,1);}
 	static addVectors(){
 		var temp = new Vector2();
 		for(let i = 0; i < arguments.length; i += 1){
@@ -39,10 +58,6 @@ class Vector2{
 			temp.x *= arguments[i].x; temp.y *= arguments[i].y
 		}return temp;
 	}
-	static multiplyVectorByScalar(vector,scalar){
-		return new Vector2(vector.x * scalar, vector.y * scalar);
-	}
-
 }
 class GravObject{
 	constructor(_Name,_Mass, _Radius, _InitialPosition, _InitialVelocity, _isStatic = false, _isActive = true){
@@ -183,25 +198,48 @@ class Plotter{
 		
 	}
 }
+class Camera{
+	constructor(_position = new Vector2(), _zoom = 1){
+		this.position = _position;
+		this.zoom = _zoom;
+		this.zoomFactor = 2;
+		this.shiftFactor = 100;
+	}
+	worldPosition(){
+		return this.position.multiply(1/this.zoom);
+	}
+	move(shift, factor = 1, directionMod = new Vector2(1,1)){
+		this.position.add(shift.scale(directionMod).multiply(factor),true);
+		plotter.setSL("Camera position - x: "+ round(this.worldPosition().x, 100) + ", y: "+ round(this.worldPosition().y, 100));
+	}
+	zoomOn(){
+		this.zoom *= this.zoomFactor; this.position.x *=2; this.position.y *=2;
+		plotter.setSL("zoom - 1/" + 1/this.zoom, 1);
+	}
+	zoomOut(){
+		this.zoom /= this.zoomFactor; this.position.x /=2; this.position.y /=2;
+		plotter.setSL("zoom - 1/" + 1/this.zoom, 1);
+	}
+}
+
 var canvas = document.getElementById("canvas");
-
-
-
 canvas.style = "border: 1px solid";
 var ctx = canvas.getContext("2d");
 var gridSize = 2000;
 var mouseData = {mousedown: false, lastPos: undefined, delta: undefined};
-var camera = {position: new Vector2(), zoom: 1/128, zoomFactor: 2, shiftFactor: 100};
+var camera = new Camera();
+// var camera = {position: new Vector2(), zoom: 1/128, zoomFactor: 2, shiftFactor: 100};
 var time = new Time();
 var objects = [];
 var objectsLimit = 500;
 plotter = new Plotter(canvas, camera);
 flags = {alt: false, helpPageActive: false};
 var G = 20;
+function random(min = -1, max = 1){return Math.random()*(max-min) + min;}
+function round(val,to = 1){return Math.round(val*to)/to;}
 function resizeCanvas(){
 	canvas.width = document.body.scrollWidth * 0.9;
 	canvas.height = document.body.scrollHeight * 0.9;	
-	
 }
 window.onresize = function(event){
 	plotter.setSL("Canvas resized", 1);
@@ -210,12 +248,12 @@ window.onresize = function(event){
 	}
 
 window.onload = function(){
-	resizeCanvas();
+	//checking for android device
 	var ua = navigator.userAgent.toLowerCase();
 	var isAndroid = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
 	if(isAndroid) {alert("This app may not work correctly on your device! Please use PC.");}
-	requestAnimationFrame(redraw);
 	hookListeners();
+	requestAnimationFrame(redraw);
 }
 
 //
