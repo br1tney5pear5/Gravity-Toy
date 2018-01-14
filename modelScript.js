@@ -1,4 +1,4 @@
-  class Time{
+ class Time{
 	constructor(){
 		this.startTime = new Date().getTime(),	
 		this.lastTime = 0;
@@ -18,40 +18,52 @@
 	deltaTimeInSeconds(){return this.deltaTime()/1000;}
 	setLastTime(){this.lastTime = this.getTime();}
 }
-
+class Test{
+	foo(){console.log("tu dynamiczna");}
+	static foo(vector,scalar){new Vector2(vector.x * scalar, vector.y*scalar);}
+}
 class Vector2{
 	constructor(_x=0,_y=0){this.x = _x; this.y = _y;}
+
+	
+	sin(){return this.y/this.magnitude();} //obsolete, rather use normalize().y
+	cos(){return this.x/this.magnitude();} //obsolete, rather use normalize().x
+
 	magnitude() {return Math.sqrt(Math.pow(this.x,2)+Math.pow(this.y,2));}
-	sin(){return this.y/this.magnitude();}
-	cos(){return this.x/this.magnitude();}
-	not(apply = false){
-		if(apply){this.x = -this.x; this.y = -this.y; return this;}
-		else{return new Vector2(-this.x, -this.y);}
+	normalize(){
+		var mag = this.magnitude();
+		this.x / mag; this.y / mag; return this;
 	}
-	add(vector, apply =  false){
-		if(apply){this.x +=vector.x; this.y += vector.y; return this;}
-		else{return new Vector2(this.x + vector.x, this.y + vector.y);}
+	not(){this.x = -this.x; this.y = -this.y; return this;}
+	add(vector){this.x +=vector.x; this.y += vector.y; return this;}
+	subtract(vector){this.x -=vector.x; this.y -= vector.y; return this;}
+	scale(vector){this.x *= vector.x; this.y *= vector.y; return this;}
+	multiply(scalar){this.x *= scalar; this.y *= scalar; return this;}
+	divide(scalar){this.x /= scalar; this.y /= scalar; return this;}
+	
+	static flip(vector){return new Vector2(vector.y, vector.x);}
+	static magnitude(vector){return Math.sqrt(Math.pow(vector.x,2)+Math.pow(vector.y,2));}
+	static normalize(vector){
+		var mag = vector.magnitude();
+		return new Vector2(vector.x/mag, vector.y/mag);
 	}
-	subtract(vector, apply = false){
-		if(apply){this.x -=vector.x; this.y -= vector.y; return this;}
-		else{return new Vector2(this.x - vector.x, this.y - vector.y);}
-	}
-	scale(vector, apply = false){
-		if(apply){this.x *= vector.x; this.y *= vector.y; return this;}
-		else{return new Vector2(this.x * vector.x, this.y * vector.y);}
-	}
-	multiply(scalar, apply = false){
-		if(apply){this.x *= scalar; this.y *= scalar; return this;}
-		else{return new Vector2(this.x * scalar, this.y * scalar);}
-	}
+	static not(vector){return new Vector2(-vector.x, -vector.y);}
+	static add(vector1, vector2){return new Vector2(vector1.x + vector2.x, vector1.y + vector2.y);}
+	static subtract(vector1, vector2){return new Vector2(vector1.x - vector2.x, vector1.y - vector2.y);}
+	static scale(vector1, vector2){return new Vector2(vector1.x * vector2.x, vector1.y * vector2.y);}
+	static multiply(vector, scalar){return new Vector2(vector.x * scalar, vector.y * scalar);}
+	static divide(vector, scalar){return new Vector2(vector.x / scalar, vector.y / scalar);}
+
 	static random(min = -1, max = 1){return new Vector2(random(min, max), random(min, max));}
 	static one(){return new Vector2(1,1);}
+
+	static distance(vector1,vector2){return Vector2.subtract(vector1,vector2);}
 	static addVectors(){
 		var temp = new Vector2();
 		for(let i = 0; i < arguments.length; i += 1){
 			temp.x += arguments[i].x; temp.y += arguments[i].y
 		}return temp;
-	}
+	}	
 	static multiplyVectors(){
 		var temp = new Vector2(1,1);
 		for(let i = 0; i < arguments.length; i += 1){
@@ -59,7 +71,7 @@ class Vector2{
 		}return temp;
 	}
 }
-class GravObject{
+class Planet{
 	constructor(_Name,_Mass, _Radius, _InitialPosition, _InitialVelocity, _isStatic = false, _isActive = true){
 		this.name = _Name;
 		this.mass = _Mass;
@@ -169,7 +181,7 @@ class Plotter{
 
 	}
 	
-	drawReferenceSystem(){
+		drawReferenceSystem(){
 		this.recalMid();
 		this.context.beginPath();
 		this.context.moveTo(0, this.relativeMid.y);
@@ -180,7 +192,7 @@ class Plotter{
 		this.context.lineTo(this.canv.width/4,this.relativeMid.y+this.unitIndicatorLength);
 		this.context.stroke();
 	}
-	drawGravObjectInfo(object){ //its complicated!
+	drawPlanetInfo(object){ //its complicated!
 		this.recalMid();
 		var flip = new Vector2(false,false);
 		var transformedStartPos = this.transformPositon(Vector2.addVectors(object.position, new Vector2(object.radius,0)));
@@ -199,17 +211,17 @@ class Plotter{
 	}
 }
 class Camera{
-	constructor(_position = new Vector2(), _zoom = 1){
+	constructor(_position = new Vector2(), _zoom = 1/1024){
 		this.position = _position;
 		this.zoom = _zoom;
 		this.zoomFactor = 2;
 		this.shiftFactor = 100;
 	}
 	worldPosition(){
-		return this.position.multiply(1/this.zoom);
+		return Vector2.multiply(this.position, 1/this.zoom);
 	}
-	move(shift, factor = 1, directionMod = new Vector2(1,1)){
-		this.position.add(shift.scale(directionMod).multiply(factor),true);
+	move(shift, factor = 1, directionMod = Vector2.one()){
+		this.position.add(shift.scale(directionMod).multiply(factor));
 		plotter.setSL("Camera position - x: "+ round(this.worldPosition().x, 100) + ", y: "+ round(this.worldPosition().y, 100));
 	}
 	zoomOn(){
@@ -221,7 +233,117 @@ class Camera{
 		plotter.setSL("zoom - 1/" + 1/this.zoom, 1);
 	}
 }
+class Host{
+	constructor(){
+		this.planets = [];
+		this.planetsLimit = 500;
+		this.unnamedCount = -1;
+		this.G = 0.002;
+	}
+	ok(){console.log("imokey");}
+	clear(){
+		this.planets.length = 0;
+	}
+	
 
+	recal(){
+		// for(let i = 0; i < this.planets.length; i += 1){
+		// 	if( this.planets[i] != undefined & this.planets[i].active == true){
+
+		// 		for(let j = 0; j < this.planets.length; j += 1){
+		// 			if(j != i & this.planets[j] != undefined & this.planets[i] != undefined &this.planets[j].active == true){
+		// 				var distance = new Vector2(this.planets[i].position.x -this.planets[j].position.x,this.planets[i].position.y -this.planets[j].position.y);
+		// 				var distanceMagnitude = distance.magnitude();
+						
+		// 				if(this.planets[i].static == false){
+		// 					if(distanceMagnitude != 0){
+		// 						var gravityForceScalar = (this.planets[i].mass * this.planets[j].mass * G)/distanceMagnitude;
+		// 						this.planets[i].acceleration.y = gravityForceScalar * -distance.sin() * time.deltaTime() / this.planets[i].mass;
+		// 						this.planets[i].acceleration.x =  gravityForceScalar * -distance.cos() * time.deltaTime() / this.planets[i].mass;
+		// 						this.planets[i].velocity.x += this.planets[i].acceleration.x;
+		// 						this.planets[i].velocity.y += this.planets[i].acceleration.y;
+		// 					}
+											
+		// 				}
+		// 				if((this.planets[i].radius + this.planets[j].radius) > distanceMagnitude){
+		// 					var index1 = this.planets.indexOf(this.planets[i].radius > this.planets[j].radius ? this.planets[i] : this.planets[j]);
+		// 					var index2 = this.planets.indexOf(this.planets[i].radius <= this.planets[j].radius ? this.planets[i] : this.planets[j]);
+		// 					this.planets[index1].radius = Math.sqrt(Math.pow(this.planets[index1].radius,2) + Math.pow(this.planets[index2].radius,2));
+		// 					var massRatio = new Vector2(this.planets[index1].mass, this.planets[index2].mass).cos();
+		// 					this.planets[index1].velocity.x = this.planets[index1].velocity.x*massRatio + this.planets[index2].velocity.x*(1-massRatio);
+		// 					this.planets[index1].velocity.y =  this.planets[index1].velocity.y*massRatio + this.planets[index2].velocity.y*(1-massRatio);
+		// 					// console.log(this.planets[index1].radius);
+		// 					this.planets[index1].mass += this.planets[index2].mass;
+		// 					this.planets.splice(index2,1);
+		// 					//no operations on this.planets[i or j] can be made after this
+		// 				}
+		// 			}
+		// 		}
+		// 	}	
+		// }	
+	
+
+
+		for(let i = 0; i < this.planets.length; i += 1){
+			if( this.planets[i] != undefined & this.planets[i].active == true){
+
+				for(let j = 0; j < this.planets.length; j += 1){
+					if(j != i & this.planets[j] != undefined & this.planets[i] != undefined & this.planets[j].active == true){
+						
+						var distance = Vector2.subtract(this.planets[i].position, this.planets[j].position);
+						var distanceMagnitude = distance.magnitude();
+						
+						if(this.planets[i].static == false){
+							if(distanceMagnitude != 0){
+								var gravityForce = (this.planets[i].mass * this.planets[j].mass * this.G)/distanceMagnitude;
+								//this.planets[i].acceleration = Vector2.flip(Vector2.normalize(distance)).multiply(gravityForce* time.deltaTime()).divide(this.planets[i].mass);
+							
+		 						this.planets[i].acceleration.y = gravityForce * -distance.normalize().y * time.deltaTime() / this.planets[i].mass;
+								this.planets[i].acceleration.x =  gravityForce * -distance.normalize().x * time.deltaTime() / this.planets[i].mass;
+								this.planets[i].velocity.add(this.planets[i].acceleration);
+							}
+						}
+
+						if( (this.planets[i].radius + this.planets[j].radius) > distanceMagnitude){
+							
+							// var index1 = this.planets.indexOf(this.planets[i].radius > this.planets[j].radius ? this.planets[i] : this.planets[j]);
+							// var index2 = this.planets.indexOf(this.planets[i].radius <= this.planets[j].radius ? this.planets[i] : this.planets[j]);
+
+							// this.planets[index1].radius = Math.sqrt(Math.pow(this.planets[index1].radius,2) + Math.pow(this.planets[index2].radius,2));
+							// var massRatio = Vector2.add(this.planets[index1].mass, this.planets[index2].mass).normalize();
+							
+							// this.planets[index1].velocity.multiply(massRatio.x).add( Vector2.multiply(this.planets[index2].velocity, massRatio.y) );
+							
+							// this.planets[index1].mass += this.planets[index2].mass;
+
+							// this.planets.splice(index2,1);
+							//no operations on this.planets[i or j] can be made after this
+						}
+					}	
+				}
+			}		
+		}
+		for(let i = 0; i < this.planets.length; i += 1){
+			if(this.planets[i].static != true & this.planets[i].active == true){
+				this.planets[i].position.add(Vector2.multiply(this.planets[i].velocity, time.deltaTimeInSeconds()));
+			}
+		}
+	}
+
+	spawnRandom(howMany = 100, minSize = 10, maxSize = 1000, positionSpan = 100 ,velocitySpan = 50000){
+		for(let i = 0; i < howMany; i+=1){
+			if(this.planets.length >= this.planetsLimit){plotter.setSL("Reached planets limit - " + this.planetsLimit);return;}
+
+			var transformedPositionSpan = clamp(positionSpan/camera.zoom, 51200, 409600);
+			var size = random(minSize, maxSize);
+			var position = Vector2.random().multiply(transformedPositionSpan).add(camera.worldPosition());
+			var velocity = Vector2.random().multiply(velocitySpan);
+			this.planets.push(new Planet("obj_"+i,size, size, position, velocity ));
+		}
+		plotter.setSL("Spawned " + howMany + " random planets.",1);
+	}
+}
+var host = new Host();
 var canvas = document.getElementById("canvas");
 canvas.style = "border: 1px solid";
 var ctx = canvas.getContext("2d");
@@ -230,13 +352,14 @@ var mouseData = {mousedown: false, lastPos: undefined, delta: undefined};
 var camera = new Camera();
 // var camera = {position: new Vector2(), zoom: 1/128, zoomFactor: 2, shiftFactor: 100};
 var time = new Time();
-var objects = [];
-var objectsLimit = 500;
+
 plotter = new Plotter(canvas, camera);
 flags = {alt: false, helpPageActive: false};
-var G = 20;
+
+function clamp(val, min, max){return (val > max ?  max : (val < min ? min : val));}
 function random(min = -1, max = 1){return Math.random()*(max-min) + min;}
 function round(val,to = 1){return Math.round(val*to)/to;}
+
 function resizeCanvas(){
 	canvas.width = document.body.scrollWidth * 0.9;
 	canvas.height = document.body.scrollHeight * 0.9;	
@@ -248,6 +371,7 @@ window.onresize = function(event){
 	}
 
 window.onload = function(){
+	
 	//checking for android device
 	var ua = navigator.userAgent.toLowerCase();
 	var isAndroid = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
