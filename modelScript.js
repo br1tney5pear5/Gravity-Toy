@@ -18,10 +18,7 @@
 	deltaTimeInSeconds(){return this.deltaTime()/1000;}
 	setLastTime(){this.lastTime = this.getTime();}
 }
-class Test{
-	foo(){console.log("tu dynamiczna");}
-	static foo(vector,scalar){new Vector2(vector.x * scalar, vector.y*scalar);}
-}
+
 class Vector2{
 	constructor(_x=0,_y=0){this.x = _x; this.y = _y;}
 
@@ -32,7 +29,7 @@ class Vector2{
 	magnitude() {return Math.sqrt(Math.pow(this.x,2)+Math.pow(this.y,2));}
 	normalize(){
 		var mag = this.magnitude();
-		this.x / mag; this.y / mag; return this;
+		this.x /= mag; this.y /= mag; return this;
 	}
 	not(){this.x = -this.x; this.y = -this.y; return this;}
 	add(vector){this.x +=vector.x; this.y += vector.y; return this;}
@@ -40,24 +37,26 @@ class Vector2{
 	scale(vector){this.x *= vector.x; this.y *= vector.y; return this;}
 	multiply(scalar){this.x *= scalar; this.y *= scalar; return this;}
 	divide(scalar){this.x /= scalar; this.y /= scalar; return this;}
-	
+	abs(){this.x =Math.abs(this.x); this.y = Math.abs(this.y);  return this;}
+
 	static flip(vector){return new Vector2(vector.y, vector.x);}
 	static magnitude(vector){return Math.sqrt(Math.pow(vector.x,2)+Math.pow(vector.y,2));}
 	static normalize(vector){
 		var mag = vector.magnitude();
 		return new Vector2(vector.x/mag, vector.y/mag);
 	}
+	static distance(vector1,vector2){return Vector2.subtract(vector1,vector2).magnitude();}
 	static not(vector){return new Vector2(-vector.x, -vector.y);}
 	static add(vector1, vector2){return new Vector2(vector1.x + vector2.x, vector1.y + vector2.y);}
 	static subtract(vector1, vector2){return new Vector2(vector1.x - vector2.x, vector1.y - vector2.y);}
 	static scale(vector1, vector2){return new Vector2(vector1.x * vector2.x, vector1.y * vector2.y);}
 	static multiply(vector, scalar){return new Vector2(vector.x * scalar, vector.y * scalar);}
 	static divide(vector, scalar){return new Vector2(vector.x / scalar, vector.y / scalar);}
-
+	static abs(vector){return new Vector2(Math.abs(vector.x), Math.abs(vector.y));}
 	static random(min = -1, max = 1){return new Vector2(random(min, max), random(min, max));}
 	static one(){return new Vector2(1,1);}
+	
 
-	static distance(vector1,vector2){return Vector2.subtract(vector1,vector2);}
 	static addVectors(){
 		var temp = new Vector2();
 		for(let i = 0; i < arguments.length; i += 1){
@@ -161,6 +160,16 @@ class Plotter{
 		this.lastPos = new Vector2(transformedStartPos.x + endPos.x * this.cam.zoom, transformedStartPos.y+ endPos.y * this.cam.zoom );
 		this.context.stroke();
 	}
+	drawLineAbs(startPos, endPos){
+	this.recalMid();
+		var transformedStartPos = this.transformPositon(startPos);
+		var transformedEndPos = this.transformPositon(endPos);
+		this.context.beginPath();
+		this.context.moveTo(transformedStartPos.x,transformedStartPos.y);
+		this.context.lineTo(transformedEndPos.x, transformedEndPos.y);
+		this.lastPos = new Vector2(transformedStartPos.x + endPos.x * this.cam.zoom, transformedStartPos.y+ endPos.y * this.cam.zoom );
+		this.context.stroke();	
+	}
 	drawRect(startPos, endPos, _fill= false){
 		this.recalMid();
 		var transformedStartPos = this.transformPositon(startPos);
@@ -216,9 +225,14 @@ class Camera{
 		this.zoom = _zoom;
 		this.zoomFactor = 2;
 		this.shiftFactor = 100;
+		this.followPosition = undefined;
+	}
+	setWorldPosition(pos){
+		this.position = Vector2.multiply(pos, this.zoom);
+		return this.worldPosition();
 	}
 	worldPosition(){
-		return Vector2.multiply(this.position, 1/this.zoom);
+		return Vector2.divide(this.position, this.zoom);
 	}
 	move(shift, factor = 1, directionMod = Vector2.one()){
 		this.position.add(shift.scale(directionMod).multiply(factor));
@@ -232,92 +246,55 @@ class Camera{
 		this.zoom /= this.zoomFactor; this.position.x /=2; this.position.y /=2;
 		plotter.setSL("zoom - 1/" + 1/this.zoom, 1);
 	}
+	routine(){
+		if(this.followPosition != undefined){
+			this.setWorldPosition(this.followPosition);
+		}
+	}
 }
 class Host{
 	constructor(){
 		this.planets = [];
 		this.planetsLimit = 500;
 		this.unnamedCount = -1;
-		this.G = 0.002;
+		this.G = 200;
 	}
-	ok(){console.log("imokey");}
 	clear(){
 		this.planets.length = 0;
 	}
 	
-
+	chooseBiggerRadius(planet1,planet2){
+		//i could make sorting here to make this method more versitale, but it really would not be used
+		if(planet2.radius > planet1.radius){return new Array(planet2, planet1);}
+		else{return new Array(planet1,planet2);}
+	}
 	recal(){
-		// for(let i = 0; i < this.planets.length; i += 1){
-		// 	if( this.planets[i] != undefined & this.planets[i].active == true){
-
-		// 		for(let j = 0; j < this.planets.length; j += 1){
-		// 			if(j != i & this.planets[j] != undefined & this.planets[i] != undefined &this.planets[j].active == true){
-		// 				var distance = new Vector2(this.planets[i].position.x -this.planets[j].position.x,this.planets[i].position.y -this.planets[j].position.y);
-		// 				var distanceMagnitude = distance.magnitude();
-						
-		// 				if(this.planets[i].static == false){
-		// 					if(distanceMagnitude != 0){
-		// 						var gravityForceScalar = (this.planets[i].mass * this.planets[j].mass * G)/distanceMagnitude;
-		// 						this.planets[i].acceleration.y = gravityForceScalar * -distance.sin() * time.deltaTime() / this.planets[i].mass;
-		// 						this.planets[i].acceleration.x =  gravityForceScalar * -distance.cos() * time.deltaTime() / this.planets[i].mass;
-		// 						this.planets[i].velocity.x += this.planets[i].acceleration.x;
-		// 						this.planets[i].velocity.y += this.planets[i].acceleration.y;
-		// 					}
-											
-		// 				}
-		// 				if((this.planets[i].radius + this.planets[j].radius) > distanceMagnitude){
-		// 					var index1 = this.planets.indexOf(this.planets[i].radius > this.planets[j].radius ? this.planets[i] : this.planets[j]);
-		// 					var index2 = this.planets.indexOf(this.planets[i].radius <= this.planets[j].radius ? this.planets[i] : this.planets[j]);
-		// 					this.planets[index1].radius = Math.sqrt(Math.pow(this.planets[index1].radius,2) + Math.pow(this.planets[index2].radius,2));
-		// 					var massRatio = new Vector2(this.planets[index1].mass, this.planets[index2].mass).cos();
-		// 					this.planets[index1].velocity.x = this.planets[index1].velocity.x*massRatio + this.planets[index2].velocity.x*(1-massRatio);
-		// 					this.planets[index1].velocity.y =  this.planets[index1].velocity.y*massRatio + this.planets[index2].velocity.y*(1-massRatio);
-		// 					// console.log(this.planets[index1].radius);
-		// 					this.planets[index1].mass += this.planets[index2].mass;
-		// 					this.planets.splice(index2,1);
-		// 					//no operations on this.planets[i or j] can be made after this
-		// 				}
-		// 			}
-		// 		}
-		// 	}	
-		// }	
-	
-
-
 		for(let i = 0; i < this.planets.length; i += 1){
 			if( this.planets[i] != undefined & this.planets[i].active == true){
 
 				for(let j = 0; j < this.planets.length; j += 1){
 					if(j != i & this.planets[j] != undefined & this.planets[i] != undefined & this.planets[j].active == true){
 						
-						var distance = Vector2.subtract(this.planets[i].position, this.planets[j].position);
+						var distance = Vector2.subtract(this.planets[i].position, this.planets[j].position).not();
 						var distanceMagnitude = distance.magnitude();
 						
 						if(this.planets[i].static == false){
 							if(distanceMagnitude != 0){
 								var gravityForce = (this.planets[i].mass * this.planets[j].mass * this.G)/distanceMagnitude;
-								//this.planets[i].acceleration = Vector2.flip(Vector2.normalize(distance)).multiply(gravityForce* time.deltaTime()).divide(this.planets[i].mass);
-							
-		 						this.planets[i].acceleration.y = gravityForce * -distance.normalize().y * time.deltaTime() / this.planets[i].mass;
-								this.planets[i].acceleration.x =  gravityForce * -distance.normalize().x * time.deltaTime() / this.planets[i].mass;
+								this.planets[i].acceleration = distance.normalize().multiply(gravityForce*time.deltaTime()).divide(this.planets[i].mass);
 								this.planets[i].velocity.add(this.planets[i].acceleration);
 							}
 						}
 
-						if( (this.planets[i].radius + this.planets[j].radius) > distanceMagnitude){
-							
-							// var index1 = this.planets.indexOf(this.planets[i].radius > this.planets[j].radius ? this.planets[i] : this.planets[j]);
-							// var index2 = this.planets.indexOf(this.planets[i].radius <= this.planets[j].radius ? this.planets[i] : this.planets[j]);
+						if( (this.planets[i].radius + this.planets[j].radius) > distanceMagnitude ){
 
-							// this.planets[index1].radius = Math.sqrt(Math.pow(this.planets[index1].radius,2) + Math.pow(this.planets[index2].radius,2));
-							// var massRatio = Vector2.add(this.planets[index1].mass, this.planets[index2].mass).normalize();
-							
-							// this.planets[index1].velocity.multiply(massRatio.x).add( Vector2.multiply(this.planets[index2].velocity, massRatio.y) );
-							
-							// this.planets[index1].mass += this.planets[index2].mass;
-
-							// this.planets.splice(index2,1);
-							//no operations on this.planets[i or j] can be made after this
+							var index1 = host.planets.indexOf(host.planets[i].radius > host.planets[j].radius ? host.planets[i] : host.planets[j]);
+							var index2 = host.planets.indexOf(host.planets[i].radius <= host.planets[j].radius ? host.planets[i] : host.planets[j]);
+							this.planets[index1].radius = Math.sqrt(Math.pow(host.planets[index1].radius,2) + Math.pow(host.planets[index2].radius,2));
+							var massRatio = new Vector2(this.planets[index1].mass, this.planets[index2].mass).normalize();
+							this.planets[index1].velocity.multiply(massRatio.x).add(Vector2.multiply(this.planets[index2].velocity, massRatio.y));
+							this.planets[index1].mass += host.planets[index2].mass;
+							this.planets.splice(index2,1);
 						}
 					}	
 				}
@@ -352,8 +329,7 @@ var mouseData = {mousedown: false, lastPos: undefined, delta: undefined};
 var camera = new Camera();
 // var camera = {position: new Vector2(), zoom: 1/128, zoomFactor: 2, shiftFactor: 100};
 var time = new Time();
-
-plotter = new Plotter(canvas, camera);
+var plotter = new Plotter(canvas, camera);
 flags = {alt: false, helpPageActive: false};
 
 function clamp(val, min, max){return (val > max ?  max : (val < min ? min : val));}
