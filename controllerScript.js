@@ -30,15 +30,25 @@ function changeTimeSpeed(factor){
 	plotter.setSL("Time Speed - " + time.speed);
 	time.stop = false;
 }
-function followToggle(){//not working yet
-	// var smallestMagnitude = 0;
-	// var difference = 0;
-	// for(let i = 0; i < host.planets.length; i++ ){
-	// 	difference = Vector2.multiplyVectorByScalar(camera.position,1/camera.zoom).subtract(host.planets[i].position);
-	// 	smallestMagnitude = difference < smallestMagnitude ? difference : smallestMagnitude;
-	// }
-	// log(smallestMagnitude);
+function followToggle(){
+	// for correction
 
+	if(camera.followPosition == undefined & host.planets.length > 0){
+		var distance = undefined;
+		var followObj = host.planets[0];		
+
+		for(let i = 0; i < host.planets.length; i += 1){
+			distance = Vector2.distance(camera.worldPosition(), host.planets[i].position);
+			if( distance < Vector2.distance(camera.worldPosition(), followObj.position)){
+				followObj = host.planets[i];
+			}
+		}
+		if(followObj != undefined){camera.followPosition = followObj.position;}
+		plotter.setSL( "Camera following on");
+	}else{
+		camera.followPosition = undefined;
+		plotter.setSL( "Camera following off");
+	}
 }
 function log(message){
 	console.log(message);
