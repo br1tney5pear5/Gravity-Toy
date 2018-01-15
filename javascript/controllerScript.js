@@ -5,7 +5,6 @@ var close = document.getElementsByClassName("close")[0];
 //modal==
 
 function hookListeners(){
-	host.spawnRandom();
 	canvas.addEventListener("mousedown", function(event){mouseData.mousedown = true},false);
 	canvas.addEventListener("mouseup", function(event){mouseData.mousedown = false},false);
 	canvas.addEventListener("mousemove", mouseCameraShift, false);
@@ -32,7 +31,6 @@ function changeTimeSpeed(factor){
 }
 function followToggle(){
 	// for correction
-
 	if(camera.followPosition == undefined & host.planets.length > 0){
 		var distance = undefined;
 		var followObj = host.planets[0];		
