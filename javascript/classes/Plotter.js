@@ -12,6 +12,7 @@ class Plotter{
 		this.SLFontSize = 28;
 		this.SLMessage = "";
 		this.SLTime = 0;
+		this.isVeloRelative = false;
 		this.recalMid();
 	}
 	recalMid() {
@@ -19,9 +20,21 @@ class Plotter{
 		this.canvasMid = Vector2.divide(this.canvasSize, 2);
 		this.center = Vector2.subtract(this.canvasMid, this.cam.position);
 	}
+	toggleVeloRelativity(){
+		this.isVeloRelative = !this.isVeloRelative;
+		log(this.isVeloRelative);
+		if(this.isVeloRelative){
+			//this.setSL()
+		}else{
+			//this.setSL()
+		}
+	}
 	randomColor(){return "rgb(" +Math.round( Math.random()*255) + ", " + Math.round( Math.random()*255)+ ", "+Math.round( Math.random()*255) + " )"};
 	worldToScreenPos(pos){
 		return Vector2.add(this.center, Vector2.multiply(pos, this.cam.zoom));
+	}
+	screenToWorldPos(pos){
+		return Vector2.add(pos, this.cam.worldPosition());
 	}
 	convertPostion(pos){
 		return (pos != undefined ? this.worldToScreenPos(pos) : new Vector2(this.lastPos.x, this.lastPos.y));
@@ -30,9 +43,9 @@ class Plotter{
 		var tempPos = this.worldToScreenPos(pos);
 
 		if(this.worldToScreenPos(pos).y > this.canvasSize.y/2*this.cam.zoom){
-			this.setSL("true");
+			return true;
 		}else{
-			this.setSL("false");
+			return false;
 		}
 	}
 	
@@ -114,7 +127,7 @@ class Plotter{
 	}
 	drawReferenceSystem(){
 		this.recalMid();
-		this.isOnScreen(new Vector2());
+		//this.isOnScreen(new Vector2());
 		this.drawLineScreen(new Vector2(0,this.center.y), new Vector2(this.canvasSize.x, 0)); 	
 		this.drawLineScreen(new Vector2(this.center.x,0), new Vector2(0, this.canvasSize.y));
 		// this.context.moveTo(this.canv.width/4, this.center.y-this.unitIndicatorLength);
@@ -131,10 +144,15 @@ class Plotter{
 		this.drawArc(planet.position, planet.radius,0, 2*Math.PI);
 		this.setStyle(planet.color, 0.3, 0,0);
 		this.drawArc(planet.position, planet.radius,0, 2*Math.PI,true);
+		
 		//velocity
-		this.setStyle("#FFF000", 1, 3*active,3*active);
-		this.drawLineWorld(planet.position, Vector2.multiply( planet.velocity,0.2), true);
-	
+		if(this.isVeloRelative & this.cam.followPlanet != undefined){
+			this.setStyle("#FFF000", 1, 3*active,3*active);
+			this.drawLineWorld(planet.position, Vector2.multiply(Vector2.subtract(planet.velocity, this.cam.followPlanet.velocity), 0.2), true);
+		}else{
+			this.setStyle("#FFF000", 1, 3*active,3*active);
+			this.drawLineWorld(planet.position, Vector2.multiply( planet.velocity,0.2), true);
+		}
 		//drawing orbit evaluation //not implemented yet	
 	}
 	drawPlanetInfo(object){ //its complicated!

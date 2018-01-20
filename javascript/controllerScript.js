@@ -31,7 +31,7 @@ function changeTimeSpeed(factor){
 }
 function followToggle(){
 	// for correction
-	if(camera.followPosition == undefined & host.planets.length > 0){
+	if(camera.followPlanet == undefined & host.planets.length > 0){
 		var distance = undefined;
 		var followObj = host.planets[0];		
 
@@ -41,10 +41,10 @@ function followToggle(){
 				followObj = host.planets[i];
 			}
 		}
-		if(followObj != undefined){camera.followPosition = followObj.position;}
+		if(followObj != undefined){camera.followPlanet = followObj;}
 		plotter.setSL( "Camera following on");
 	}else{
-		camera.followPosition = undefined;
+		camera.followPlanet = undefined;
 		plotter.setSL( "Camera following off");
 	}
 }
@@ -62,7 +62,7 @@ function keyManagment(event){
 		case 38: camera.move(new Vector2(0,-1), camera.shiftFactor); break; //up
 		case 39: camera.move(new Vector2(1,0), camera.shiftFactor);  break; //right
 		case 40: camera.move(new Vector2(0,1), camera.shiftFactor);  break; //down
-		case 86: host.spawnRandom(100, 10,1000); break; //v
+		case 86: plotter.toggleVeloRelativity(); break; //v
 		case 66: host.spawnRandom(10, 100, 10000); break; //b
 		case 70: followToggle(); break; //F
 		//case 78: host.planets.push(new Planet("Static_obj", 5000, 5000,Vector2.multiplyVectorByScalar(camera.position, 1/camera.zoom), new Vector2(), true, true )); plotter.setSL("Static object spawned"); break; //n
