@@ -5,12 +5,14 @@ var close = document.getElementsByClassName("close")[0];
 //modal==
 
 function hookListeners(){
-	canvas.addEventListener("mousedown", function(event){mouseData.mousedown = true},false);
-	canvas.addEventListener("mouseup", function(event){mouseData.mousedown = false},false);
+	canvas.addEventListener("mousedown", function(){mouseData.mousedown = true},false);
+	canvas.addEventListener("mouseup", function(){mouseData.mousedown = false},false);
 	canvas.addEventListener("mousemove", mouseCameraShift, false);
 	window.addEventListener("keydown", keyManagment);
+	canvas.addEventListener("mouseleave", function(){mouseData.mousedown = false}, false); //antibug
 }
 function mouseCameraShift(event){
+	log(event);
 	if(mouseData.lastPos != undefined){
 		mouseData.delta = new Vector2(event.clientX - mouseData.lastPos.x, event.clientY - mouseData.lastPos.y);
 	}
