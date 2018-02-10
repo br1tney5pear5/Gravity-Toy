@@ -31,6 +31,8 @@ body, html{
 	vertical-align: middle;
 	background-color: rgb(152,152,152);
 }
+#canvas:hover,#canvas:focus {cursor: pointer;}
+
 #button{
 	font-family: 'Roboto', sans-serif;
 	letter-spacing: 1px;
