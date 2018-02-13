@@ -9,7 +9,6 @@ var host = new Host();
 //to reform
 var mouseData = {mousedown: false, lastPos: undefined, delta: undefined};
 flags = {alt: false, helpPageActive: false};
-var gridSize = 2000;
 canvasToPageRatio = new Vector2(0.9,0.9); //keep them both < 1;
 //========
 
@@ -31,7 +30,7 @@ window.onload = function(){
 	hookListeners();
 	requestAnimationFrame(Update);
 }
-
+function bigger(val1,val2){return (val1 < val2 ? val2 : val1)};
 function clamp(val, min, max){return (val > max ?  max : (val < min ? min : val));}
 function random(min = -1, max = 1){return Math.random()*(max-min) + min;}
 function round(val,to = 1){return Math.round(val*to)/to;}
