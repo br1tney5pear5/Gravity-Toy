@@ -9,6 +9,7 @@ class Plotter{
 		this.fontSize = 18;
 		this.textMargin = new Vector2(5,5);
 		this.infoTableMargin = 30;
+		this.gridSize = 100000;
 		this.SLFontSize = 28;
 		this.SLMessage = "";
 		this.SLTime = 0;
@@ -130,6 +131,19 @@ class Plotter{
 		//this.isOnScreen(new Vector2());
 		this.drawLineScreen(new Vector2(0,this.center.y), new Vector2(this.canvasSize.x, 0)); 	
 		this.drawLineScreen(new Vector2(this.center.x,0), new Vector2(0, this.canvasSize.y));
+		//this.drawLineScreen(new Vector2(this.cam.worldPosition().x,this.center.y), new Vector2(100,100));
+		var howmany = parseInt(bigger(this.canvasSize.x,this.canvasSize.y)/this.cam.zoom/this.gridSize/2);
+		this.setSL(howmany);
+		for(let i = -howmany; i < 2*howmany; i++){
+			var tempCenter = Vector2.subtract(this.cam.worldPosition(), new Vector2(this.cam.worldPosition().x % this.gridSize, this.cam.worldPosition().y % this.gridSize));
+			tempCenter.add(new Vector2(i*this.gridSize));
+			this.drawLineScreen(new Vector2(this.worldToScreenPos(tempCenter).x, 0), new Vector2(0,this.canvasSize.y));
+			this.drawLineScreen(new Vector2(0,this.worldToScreenPos(tempCenter).y), new Vector2(this.canvasSize.x,0));
+			// this.drawLineWorld(tempCenter, new Vector2(0,1000));
+			//this.drawLineScreen(new Vector2(0,this.center.y + i*this.gridSize), new Vector2(this.canvasSize.x, 0)); 	
+			//this.drawLineWorld(this.screenToWorldPos(new Vector2(this.center.x + i*this.gridSize,0)), this.screenToWorldPos(new Vector2(0, this.canvasSize.y+10)), false);
+		}
+	
 		// this.context.moveTo(this.canv.width/4, this.center.y-this.unitIndicatorLength);
 		// this.context.lineTo(this.canv.width/4,this.center.y+this.unitIndicatorLength);
 	}
